@@ -7,6 +7,19 @@ Person LEFT JOIN Address ON Person.PersonID = Address.PersonID;
 # 176. Second Highest Salary
 SELECT IFNULL((SELECT DISTINCT Salary FROM Employee ORDER BY Salary DESC LIMIT 1,1),null) AS SecondHighestSalary;
 
+# 181. Employees Earning More Than Their Managers
+SELECT e1.Name AS Employee FROM 
+Employee e1 LEFT JOIN Employee e2
+ON e1.ManagerId = e2.Id
+WHERE e1.Salary > e2.Salary
+
+# 182. Duplicate Emails
+SELECT Email FROM Person GROUP BY Email HAVING COUNT(Email) > 1
+
+# 183. Customers Who Never Order
+SELECT Customers.Name AS `Customers`
+FROM Customers 
+WHERE Customers.Id NOT IN (SELECT CustomerId from Orders)
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -27,8 +40,34 @@ END
 SELECT Score, dense_rank() over (order by Score DESC) as `Rank`
 from Scores;
 
+# 180. Consecutive Numbers
+SELECT DISTINCT l1.Num AS `ConsecutiveNums`
+FROM Logs l1, Logs l2, Logs l3
+WHERE l1.Id = l2.Id - 1 AND l2.Id = l3.Id - 1
+    AND l1.Num = l2.Num AND l2.Num = l3.Num
+
+# 184. Department Highest Salary
+SELECT d.Name AS `Department`, e.Name AS `Employee`, e.Salary AS `Salary`
+FROM Employee e, Department d
+WHERE e.DepartmentId = d.Id
+AND (e.Salary,e.DepartmentId) IN (SELECT MAX(Salary), DepartmentId FROM Employee GROUP BY DepartmentId)
+
 
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
 ## Hard
+
+# 185. Department Top Three Salaries
+select d.Name as Department, a. Name as Employee, a. Salary 
+from (
+select e.*, dense_rank() over (partition by DepartmentId order by Salary desc) as DeptPayRank 
+from Employee e 
+) a 
+join Department d
+on a. DepartmentId = d. Id 
+where DeptPayRank <=3
+# SELECT d.Name AS `Department`, e.Name AS `Employee`, e.Salary AS `Salary`
+# FROM Employee e LEFT JOIN Department d ON e.DepartmentId = d.Id
+# WHERE (e.DepartmentId, e.Salary) IN (select departmentid, salary from(select salary, departmentid, 
+#                                             dense_rank() over(partition by departmentid order by salary desc) as `rank` from employee) as t where t.rank <= 3)
