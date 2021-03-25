@@ -21,6 +21,22 @@ SELECT Customers.Name AS `Customers`
 FROM Customers 
 WHERE Customers.Id NOT IN (SELECT CustomerId from Orders)
 
+# 196. Delete Duplicate Emails
+delete a from Person as a, Person as b where a.Email = b.Email and a.Id > b.Id
+
+# 197. Rising Temperature
+select b.id as id from weather as a, weather as b 
+where to_days(a.recordDate) = to_days(b.recordDate)-1 and a.Temperature < b.Temperature
+
+# 262. Trips and Users
+select request_at as Day, round(sum(if(status='completed',0,1))/count(*),2) as `Cancellation Rate`
+from trips 
+right join users as u1 on trips.client_id = u1.users_id 
+right join users as u2 on trips.driver_id = u2.users_id 
+where (u1.role = 'client' or u2.role = 'driver') and u1.banned = 'No' and u2.banned = 'No'
+    and request_at between "2013-10-01" and "2013-10-03"
+group by request_at
+
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
 ## Medium
