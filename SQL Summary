@@ -37,6 +37,9 @@ where (u1.role = 'client' or u2.role = 'driver') and u1.banned = 'No' and u2.ban
     and request_at between "2013-10-01" and "2013-10-03"
 group by request_at
 
+# 627. Swap Salary
+update salary
+set sex = case sex when 'm' then 'f' else 'm' end
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
 ## Medium
@@ -68,6 +71,21 @@ FROM Employee e, Department d
 WHERE e.DepartmentId = d.Id
 AND (e.Salary,e.DepartmentId) IN (SELECT MAX(Salary), DepartmentId FROM Employee GROUP BY DepartmentId)
 
+# 626. Exchange Seats
+select
+(case when mod(id,2)!=0 and counts!=id then id+1
+      when mod(id,2)!=0 and counts=id then id
+      else id-1 end) as id,
+      student
+from
+    seat,
+    (select count(*) as counts from seat) as seat_counts
+order by id asc
+# select * from
+# (select id+1 as id, student from seat where mod(id,2)=1 and id not in (select count(*) from seat)
+# union select id-1 as id, student from seat where mod(id,2)=0
+# union select id as id, student from seat where mod(id,2)=1 and id = (select count(*) from seat)) as a
+# order by id
 
 
 
