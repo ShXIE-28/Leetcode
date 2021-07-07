@@ -37,6 +37,25 @@ where (u1.role = 'client' or u2.role = 'driver') and u1.banned = 'No' and u2.ban
     and request_at between "2013-10-01" and "2013-10-03"
 group by request_at
 
+# 512. Game Play Analysis II
+## method 1 - inner join
+select a.player_id, a.device_id from
+(activity as a inner join (select player_id, min(event_date) as first_date
+                          from activity group by player_id) as b 
+ on a.player_id=b.player_id and a.event_date=b.first_date)
+ 
+## method 2
+select player_id, device_id from activity
+where (player_id, event_date) in (select player_id, min(event_date) from activity group by player_id)
+
+## method 3 - rank
+select a.player_id, a.device_id
+from 
+(select player_id, device_id, rank() over(partition by player_id order by event_date) as date_rank 
+ from activity) as a
+where a.date_rank = 1
+
+
 # 627. Swap Salary
 update salary
 set sex = case sex when 'm' then 'f' else 'm' end
